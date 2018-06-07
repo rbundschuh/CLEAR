@@ -7,6 +7,8 @@ The following packages should additionally be installed:
 - `matplotlib`
 - `numpy`
 
+Processing samples from Human genome requires approximately 1GB of RAM, but this can vary based on the size of the reference genome and complexity of the coverage map.
+
 ## Installation
 1. Ensure that python is properly installed and available on the system path.
 2. Clone the CLEAR repository into a working folder for installation.
