@@ -23,8 +23,9 @@ Processing samples from Human genome requires approximately 1GB of RAM, but this
 
 ## Running CLEAR
 For each `.bed` file, do the following:
-  1. A
-  2. B
+  1. Run `python make_dat.py [Name of reference file] [Name of the .bed file from above]`, which will generate a file ending in `.dat` with the mu callings.
+  2. Run `python fitter.py [Name of dat file generated in (1)]` which will print the passing transcripts to the terminal
+    - This can be printed to a file using `python fitter.py [Name of dat file generated in (1)] > file_name`
 
 
 ## Generating Visualization Violin Plots
