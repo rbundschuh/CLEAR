@@ -83,13 +83,14 @@ matplotlib.rcParams.update({'font.size': font_size, 'font.family': 'STIXGeneral'
 dat_files = glob( '*.dat' )
 
 # Load Profile Tables
-profile_tables = map(
-	lambda x: map(
-			lambda y: y.split( '\t' ),
-			open( str( x ), 'r' ).read().split( '\n' )[1:-1]
-	),
-	dat_files
-)
+
+profile_tables = []
+for f in dat_files:
+	to_add = []
+	for line in open( str( f ), 'r' ).read().split( '\n' )[1:-1]:
+		if 'None' in line: continue
+		to_add.append( line.split() )
+	profile_tables.append( to_add )
 
 #############################################
 
@@ -118,11 +119,15 @@ del i
 # Build data vectors
 profile_vectors = map(
 	lambda x: map(
-		lambda y: ( int( y[0] ), float( y[3] ) * 2 - 1 ), # Select index and ratio
+		lambda y: float( y[1] ), # Select index and ratio
 		x
 	),
 	profile_tables
 )
+
+for i in range( len( profile_vectors ) ):
+	for j in range( len( profile_vectors[i] ) ):
+		profile_vectors[ i ][ j ] = ( j, profile_vectors[ i ][ j ] )
 
 profile_vectors = map( lambda x: map( lambda y: y[1], x ), profile_vectors )
 
@@ -180,6 +185,6 @@ for page_num in range( page_count ):
 				ax.set_ylim( -1 - RIG_FACTOR, 1 + RIG_FACTOR )
 
 		fig.tight_layout()
-    pdf.savefig( fig )
+		pdf.savefig( fig )
 
 pdf.close()
