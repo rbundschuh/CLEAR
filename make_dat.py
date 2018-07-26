@@ -89,18 +89,25 @@ def test_gene():
         if mu is not None and not model[3]: #stranded?
             mu *= -1
         
-        results.append( ( total, mu, model[5], model[1] ) )
-        
+        #results.append( ( total, mu, model[5], model[1] ) )
+ 	results.append( ( float( total ) / float( model[5] ), mu, model[5], model[1], model[3] ) )       
+
         processed += 1
         if processed % 1000 is 0:
-            print processed, "processed,", len(models)-processed, "to go! (", 100*float(processed)/len(models), "% )"
+            print >> sys.stderr, processed, "processed,", len(models)-processed, "to go! (", 100*float(processed)/len(models), "% )"
     return results
 
 results = sorted( test_gene() )[::-1]
 
 f = open( file_name + '.dat', 'w' )
+printed = set()
 for a in sorted( results )[::-1]:
-    a = map( str, a )
-    f.write( "\t".join(a) )
-    f.write( "\n" )
+    if a[3] in printed:
+	continue
+    else:
+	printed.add( a[3] )
+	a = map( str, a )
+	f.write( "\t".join(a) )
+	f.write( "\n" )
+
 f.close()
