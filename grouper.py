@@ -1,4 +1,5 @@
 import argparse
+import sys
 
 parser = argparse.ArgumentParser(description='Groups transcript lists together.')
 parser.add_argument('fnames', metavar='File', type=str, nargs='+',
@@ -11,7 +12,7 @@ args = parser.parse_args()
 all_genes = set()
 all_samples = []
 
-print("Processing files...", args.fnames) 
+print("Processing files...", args.fnames, file=sys.stderr) 
 for file in args.fnames:
 	with open(file, 'r') as f:
 		data = f.read().strip().splitlines()
