@@ -27,6 +27,14 @@ For each `.bed` file, do the following:
   2. Run `python fitter.py [Name of dat file generated in (1)]` which will print the passing transcripts to the terminal
     - This can be printed to a file using `python fitter.py [Name of dat file generated in (1)] > file_name`
 
+## Grouping Transcript Lists
+For each transcript name file produced above, run the `grouper.py` command as follows:
+	`python grouper.py [name of file 1] [name of file 2] [name of...]`
+
+You can also add the `--require-samples [#]` parameter, where `[#]` is the number of samples a transcript
+must apper in to be included in the output. This can be used to relax the "passing in all samples" requirement
+used in the manuscript.
+
 
 ## Generating Visualization Violin Plots
 1. Open the folder with all previously-generated `.dat` files.
