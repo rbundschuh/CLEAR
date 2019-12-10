@@ -2,7 +2,7 @@ import argparse
 
 parser = argparse.ArgumentParser(description='Groups transcript lists together.')
 parser.add_argument('fnames', metavar='File', type=str, nargs='+',
-	help='an integer for the accumulator')
+	help='The names of the files which you would like to overlap')
 parser.add_argument('--require-samples', metavar='#', type=int, nargs='?',
 	help='The number of samples to require a transcript appear in to be included in the output list. Default: number of files given.')
 
