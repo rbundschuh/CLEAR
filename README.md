@@ -38,4 +38,4 @@ used in the manuscript.
 
 ## Generating Visualization Violin Plots
 1. Open the folder with all previously-generated `.dat` files.
-2. Run `python make_violin_plots.py` to create a file `violins.py` containing violin plots of all samples in the folder.
+2. Run `python make_violin_plots.py` to create a file `CLEAR_violins.pdf` containing violin plots of all samples in the folder.
