@@ -35,6 +35,8 @@ You can also add the `--require-samples [#]` parameter, where `[#]` is the numbe
 must apper in to be included in the output. This can be used to relax the "passing in all samples" requirement
 used in the manuscript.
 
+## Wrapper script
+See `wrapper.sh` for a complete wrapper for running the steps outlined above (`bash wrapper.sh`).
 
 ## Generating Visualization Violin Plots
 1. Open the folder with all previously-generated `.dat` files.
