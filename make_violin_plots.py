@@ -1,144 +1,150 @@
+#!/usr/bin/env python3
+
+import argparse
+import math
+import os
 import sys
 from glob import glob
-
-from numpy import sqrt, pi, exp
-import numpy as np
-from scipy.optimize import curve_fit
-from scipy.special import beta as B
+from typing import List
 
 import matplotlib
+import matplotlib.pyplot as plt
+from matplotlib.backends.backend_pdf import PdfPages
+
+from fitter import find_state_change, load_file, sub_file
+
 matplotlib.use('Agg')
-import matplotlib.pyplot as plt
-import matplotlib.gridspec as gridspec
-from matplotlib.backends.backend_pdf import PdfPages
 
-import matplotlib.pyplot as plt
-import matplotlib.gridspec as gridspec
-from matplotlib.backends.backend_pdf import PdfPages
 
-window_size = 250
 
-def m( x, a, b ):#, amp ):
-    #if x < 0 or x > 1: return 0
-    x = ( x + 1.0 ) / 2.0
-    
-    out = ( x * (1 - x)**(1 + b) ) / B(2,2 + b)
-    out += ( (x)**(1 + a) ) / B(2 + a,2)
-    out -= ( (x)**(2 + a) ) / B(2 + a,2)
-    amp = (window_size * 0.1) / 4.0 # Normalization Factor
-    out *= amp
-    
-    if type( x ) is np.ndarray or type( x ) is np.array:
-        for i in xrange( len( x ) ):
-            if x[i] < -1 or x[i] > 1:
-                out[i] = 0
-    elif (type( x ) is int or type(x) is float) and ( x < -1 or x > 1 ):
-        out = 0
-    return out
 
-def load_file( name ):
-    out = []
-    
-    for line in open( name, 'r' ):
-        if line.startswith( '#' ) or 'None' in line: continue
-        
-        line = line.strip().split( '\t' )
-        line[ 0 ] = float( line[ 0 ] )
-        line[ 1 ] = float( line[ 1 ] )
-        line[ 2 ] = int( line[ 2 ] )
-        line[ 4 ] = line[ 4 ].startswith( 'T' )
-        
-        out.append( ( line[ 3 ], line[ 0 ], line[ 1 ] ) )
-    
-    return out
 
-def find_state_change( dataset ):
-    for start in range( len( dataset ) / 10 ):
-        start *= 10
-        
-        a = [ i[2] for i in dataset[ start:start+window_size] ]
-        bin_count = 20
-        
-        bins = np.histogram( a, bins=bin_count, range=[-1,1] )
-        x = bins[1][:-1] + (1.0/bin_count)
-        bins = bins[0]
-        
-        res = run_model( bins, x, 0, 0, 5 )
-        if res[ 'a' ] > 2 or res[ 'b' ] > 2:
-            print "Found!", start, "(", res['a'], res['b'], ")"
-            return start
-    return -1
+def main(inputs: List[str], output: str, page_width: int, page_height: int) -> None:
+    """
+    Generate violin plots from ``.dat`` files and write them to a PDF.
 
-def sub_file( dataset ):
-    return list( ( i[2] for i in dataset ) )
+    Parameters
+    ----------
+    inputs : List[str]
+        One or more glob patterns for input ``.dat`` files.
+    output : str
+        Output PDF filename.
+    page_width : int
+        Number of plots per row.
+    page_height : int
+        Number of rows per page.
+    """
 
-def run_model( bins, x, a, b, amp ):
-    model = Model( m )
-    
-    model.set_param_hint( 'a', min=0, max=15.0, value=a )
-    model.set_param_hint( 'b', min=0, max=15.0, value=b )
-    model.set_param_hint( 'amp', min=1, max=20, value=amp )
-    
-    res = model.fit( bins, x=x, nan_policy='omit' )
-    
-    return res
+    # collect files from provided glob patterns
+    files = []
+    for pattern in inputs:
+        files.extend(glob(pattern))
+    files = sorted(set(files))
 
-def run_model( bins, x, a, b, amp ):
-    popt, pcov = curve_fit(m, x, bins, bounds=(0, [20,20]))
-    return { 'a': popt[0], 'b': popt[1] }#, 'amp': popt[2] }
+    if not files:
+        print("No input .dat files matched the given patterns.", file=sys.stderr)
+        sys.exit(1)
 
-files = list( sorted( glob( '*.dat' ) ) )
-file_data = map( load_file, files )
-file_data_sub = map( sub_file, file_data )
-limits = map( find_state_change, file_data )
+    # load inputs
+    file_data = [load_file(f) for f in files]
+    file_data_sub = [sub_file(d) for d in file_data]
+    limits = [find_state_change(d) for d in file_data]
 
-pdf = PdfPages( 'CLEAR_violins.pdf' )
+    pdf = PdfPages(output)
 
-PAGE_WIDTH = 3
-PAGE_HEIGHT = 2
-page_count = ( len( files ) / ( PAGE_WIDTH * PAGE_HEIGHT ) ) + 1
+    per_page = page_width * page_height
+    page_count = math.ceil(len(files) / float(per_page))
 
-for page_num in range( page_count ):
-	fig, axes = plt.subplots(nrows=PAGE_HEIGHT, ncols=PAGE_WIDTH, figsize=(14,7))
+    for page_num in range(int(page_count)):
+        fig, axes = plt.subplots(
+            nrows=page_height, ncols=page_width, figsize=(14, 7), dpi=300, squeeze=False
+        )
 
-	for i in xrange( PAGE_WIDTH * PAGE_HEIGHT ):
-		dat_index = page_num * PAGE_WIDTH * PAGE_HEIGHT +  i
+        for i in range(page_width * page_height):
+            dat_index = page_num * page_width * page_height + i
 
-		x_cord = i % PAGE_WIDTH
-		y_cord = i / PAGE_WIDTH
+            x_cord = i % page_width
+            y_cord = i // page_width
 
-		ax = axes[ y_cord, x_cord ]
+            ax = axes[y_cord, x_cord]
 
-		if dat_index >= len( files ):
-			ax.axis('off')
-			ax.get_xaxis().set_visible(False)
-			ax.get_yaxis().set_visible(False)
-			continue
+            if dat_index >= len(files):
+                ax.axis('off')
+                ax.get_xaxis().set_visible(False)
+                ax.get_yaxis().set_visible(False)
+                continue
 
-		ax.set_title( files[dat_index].replace( 'dat_files\\', '' ).replace( '.dat', '' ) )
+            ax.set_title(os.path.basename(
+                files[dat_index]).replace('.dat', ''))
 
-		pos, data = [], []
-		x_max = 15
-		for j in range( 0, x_max ):
-			inc = 1000
-			p = inc * j
-			pos.append( p + (inc / 2) )
-			a = file_data_sub[ dat_index ][p:p+inc]
-			if not len(a): a.append( 0 )
-			data.append( a )
+            pos, data = [], []
+            x_max = 15
+            for j in range(0, x_max):
+                inc = 1000
+                p = inc * j
+                pos.append(p + (inc / 2))
+                a = file_data_sub[dat_index][p:p+inc]
+                if not a:
+                    a = [0]
+                data.append(a)
 
-		# Draw the violin plot, note that the bw_method parameter defines the 'definition' of the KDE
-		ax.violinplot(data, pos, widths=850, showmeans=True, showextrema=True, showmedians=False, bw_method=0.2)
-		del pos, data
-				
-		if limits[ dat_index ] < x_max * 1000:
-			ax.axvline( x=limits[ dat_index ], color='r', linestyle='-', linewidth=2 )
+            # draw the violin plot, note that the bw_method parameter defines the 'definition' of the KDE
+            ax.violinplot(
+                data,
+                pos,
+                widths=850,
+                showmeans=True,
+                showextrema=True,
+                showmedians=False,
+                bw_method=0.2,
+            )
+            del pos, data
 
-		RIG_FACTOR = 0.1
-		ax.set_ylim( -1 - RIG_FACTOR, 1 + RIG_FACTOR )
-		ax.set_ylim( -1 - RIG_FACTOR, 1 + RIG_FACTOR )
+            if limits[dat_index] < x_max * 1000:
+                ax.axvline(x=limits[dat_index], color='r',
+                           linestyle='-', linewidth=2)
 
-	fig.tight_layout()
-	pdf.savefig( fig )
+            RIG_FACTOR = 0.1
+            ax.set_ylim(-1 - RIG_FACTOR, 1 + RIG_FACTOR)
 
-pdf.close()
+        fig.tight_layout()
+        pdf.savefig(fig)
+
+    pdf.close()
+
+
+if __name__ == "__main__":
+
+    parser = argparse.ArgumentParser(
+        description="Generate CLEAR violin plots from .dat files."
+    )
+
+    parser.add_argument(
+        "-i",
+        "--inputs",
+        nargs="+",
+        default=["*.dat"],
+        help="One or more glob patterns for input .dat files (default: *.dat)",
+    )
+    parser.add_argument(
+        "-o",
+        "--output",
+        default="CLEAR_violins.pdf",
+        help="Output PDF filename (default: CLEAR_violins.pdf)",
+    )
+    parser.add_argument(
+        "--page-width",
+        type=int,
+        default=3,
+        help="Number of plots per row (default: 3)",
+    )
+    parser.add_argument(
+        "--page-height",
+        type=int,
+        default=2,
+        help="Number of rows per page (default: 2)",
+    )
+
+    args = parser.parse_args()
+
+    main(args.inputs, args.output, args.page_width, args.page_height)
