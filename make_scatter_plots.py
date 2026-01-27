@@ -58,7 +58,7 @@ def main(inputs: List[str], output: str, page_width: int, page_height: int) -> N
 
     for page_num in range(int(page_count)):
         fig, axes = plt.subplots(
-            nrows=page_height, ncols=page_width, figsize=(14, 7), dpi=300
+            nrows=page_height, ncols=page_width, figsize=(14, 7), dpi=300, squeeze=False
         )
 
         for i in range(page_width * page_height):
