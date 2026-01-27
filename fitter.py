@@ -6,7 +6,7 @@ from glob import glob
 from typing import Dict, List, Tuple
 
 import numpy as np
-from numpy import exp, pi, sqrt
+
 from scipy.optimize import curve_fit
 from scipy.special import beta as B
 
@@ -78,9 +78,9 @@ def load_file(name: str) -> List[Tuple[str, float, float]]:
             line = line.strip().split("\t")
             cov_norm = float(line[0])
             mu = float(line[1])
-            length = int(line[2])
+            # length = int(line[2])
             gene = line[3]
-            strand = line[4].startswith("T")
+            # strand = line[4].startswith("T")
 
             out.append((gene, cov_norm, mu))
 

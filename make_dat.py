@@ -130,7 +130,7 @@ def test_gene(models: List[Tuple[str, str, str, bool, List[Tuple[int, int]], int
     models : List[Tuple[str, str, str, bool, List[Tuple[int, int]], int]]
         List of Tuples containing gene information (seq_name, name, chr_name, strand, exons, length).
     coverage : Dict[str, List[List[int]]]
-        List containing coverage data for each chromosome and locus.
+        Dictionary containing coverage data for each chromosome and locus.
 
     Returns
     -------
