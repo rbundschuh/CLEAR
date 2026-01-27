@@ -16,7 +16,7 @@ from fitter import find_state_change, load_file, sub_file
 matplotlib.use('Agg')
 
 
-WINDOW_SIZE = 250
+
 
 
 def main(inputs: List[str], output: str, page_width: int, page_height: int) -> None:
@@ -84,8 +84,8 @@ def main(inputs: List[str], output: str, page_width: int, page_height: int) -> N
                 p = inc * j
                 pos.append(p + (inc / 2))
                 a = file_data_sub[dat_index][p:p+inc]
-                if not len(a):
-                    a.append(0)
+                if not a:
+                    a = [0]
                 data.append(a)
 
             # draw the violin plot, note that the bw_method parameter defines the 'definition' of the KDE

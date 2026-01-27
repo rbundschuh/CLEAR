@@ -127,7 +127,7 @@ def sub_file(dataset: List[Tuple[str, float, float]]) -> List[float]:
 
 def run_model(bins: np.ndarray, x: np.ndarray) -> Dict[str, float]:
     """
-    Fit the model ``m`` to histogram ``bins`` at positions ``x``.
+    Fit the model ``fit_model`` to histogram ``bins`` at positions ``x``.
 
     Parameters
     ----------

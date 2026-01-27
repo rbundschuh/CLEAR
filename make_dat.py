@@ -61,7 +61,7 @@ def main(annotation_path: str, genomecov_path: str) -> None:
 
             if not (len(starts) == len(stops)):
                 print("START/END MISMATCH!!!", file=sys.stderr)
-                sys.exit(0)
+                sys.exit(1)
 
             length = 0
             for i in range(len(starts)):
@@ -95,7 +95,7 @@ def get_coverage(coverage: Dict[str, List[List[int]]], chromosome: str, locus: i
     Parameters
     ----------
     coverage : Dict[str, List[List[int]]]
-        List containing coverage data for each chromosome and locus.
+        Dictionary containing coverage data for each chromosome and locus.
     chromosome : str
         Chromosome name.
     locus : int
@@ -127,10 +127,10 @@ def test_gene(models: List[Tuple[str, str, str, bool, List[Tuple[int, int]], int
 
     Parameters
     ----------
-    coverage : Dict[str, List[List[int]]]
-        List containing coverage data for each chromosome and locus.
     models : List[Tuple[str, str, str, bool, List[Tuple[int, int]], int]]
         List of Tuples containing gene information (seq_name, name, chr_name, strand, exons, length).
+    coverage : Dict[str, List[List[int]]]
+        List containing coverage data for each chromosome and locus.
 
     Returns
     -------
@@ -182,12 +182,14 @@ if __name__ == "__main__":
     parser.add_argument(
         "-a", "--annotation",
         type=str,
+        required=True,
         help="Path to the annotation (`genePred` format)."
     )
 
     parser.add_argument(
         "-b", "--bed",
         type=str,
+        required=True,
         help="Path to the profiled BED file (output from `bedtools genomecov`)."
     )
 

@@ -17,7 +17,7 @@ from fitter import find_state_change, load_file, sub_file
 matplotlib.use('Agg')
 
 
-WINDOW_SIZE = 250
+
 
 
 def main(inputs: List[str], output: str, page_width: int, page_height: int) -> None:
@@ -26,7 +26,7 @@ def main(inputs: List[str], output: str, page_width: int, page_height: int) -> N
 
     Parameters
     ----------
-    inputs : list of str
+    inputs : List[str]
         One or more glob patterns for input ``.dat`` files.
     output : str
         Output PDF filename.
