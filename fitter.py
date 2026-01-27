@@ -35,11 +35,11 @@ def fit_model(x: float | np.ndarray, a: float, b: float) -> float | np.ndarray:
     numpy.ndarray or float
         Scaled density values evaluated at ``x``.
     """
-    x = (x + 1.0) / 2.0
+    x_scaled = (x + 1.0) / 2.0
 
-    out = (x * (1 - x)**(1 + b)) / B(2, 2 + b)
-    out += ((x)**(1 + a)) / B(2 + a, 2)
-    out -= ((x)**(2 + a)) / B(2 + a, 2)
+    out = (x_scaled * (1 - x_scaled)**(1 + b)) / B(2, 2 + b)
+    out += ((x_scaled)**(1 + a)) / B(2 + a, 2)
+    out -= ((x_scaled)**(2 + a)) / B(2 + a, 2)
     amp = (WINDOW_SIZE * 0.1) / 4.0  # Normalization Factor
     out *= amp
 
